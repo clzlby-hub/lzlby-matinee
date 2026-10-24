@@ -63,6 +63,7 @@ data class LauncherSettings(
     val shownApps: Set<String> = emptySet(),
     val showSystemApps: Boolean = false,
     val autoCleanMemory: Boolean = false,
+    val autoStartProxy: Boolean = true,
     val memoryThresholdPercent: Int = 80,
     val memoryCleanExclusions: Set<String> = emptySet(),
     val appOverrides: Map<String, AppOverride> = emptyMap(),
@@ -120,6 +121,7 @@ class SettingsStore(private val context: Context) {
         val shownApps = stringSetPreferencesKey("shown_apps")
         val showSystemApps = booleanPreferencesKey("show_system_apps")
         val autoCleanMemory = booleanPreferencesKey("auto_clean_memory")
+        val autoStartProxy = booleanPreferencesKey("autostart_proxy")
         val memoryThreshold = intPreferencesKey("memory_threshold_percent")
         val memoryExclusions = stringSetPreferencesKey("memory_clean_exclusions")
         val wallpaper = stringPreferencesKey("wallpaper")
@@ -194,6 +196,7 @@ class SettingsStore(private val context: Context) {
             shownApps = this[Keys.shownApps] ?: defaults.shownApps,
             showSystemApps = this[Keys.showSystemApps] ?: defaults.showSystemApps,
             autoCleanMemory = this[Keys.autoCleanMemory] ?: defaults.autoCleanMemory,
+            autoStartProxy = this[Keys.autoStartProxy] ?: defaults.autoStartProxy,
             memoryThresholdPercent = this[Keys.memoryThreshold] ?: defaults.memoryThresholdPercent,
             memoryCleanExclusions = this[Keys.memoryExclusions] ?: defaults.memoryCleanExclusions,
             wallpaper = this[Keys.wallpaper] ?: defaults.wallpaper,
@@ -266,6 +269,7 @@ class SettingsStore(private val context: Context) {
     }
     suspend fun setShowSystemApps(value: Boolean) = edit { it[Keys.showSystemApps] = value }
     suspend fun setAutoCleanMemory(value: Boolean) = edit { it[Keys.autoCleanMemory] = value }
+    suspend fun setAutoStartProxy(value: Boolean) = edit { it[Keys.autoStartProxy] = value }
     suspend fun setMemoryThreshold(value: Int) = edit { it[Keys.memoryThreshold] = value }
     suspend fun setMemoryCleanExclusions(value: Set<String>) = edit { it[Keys.memoryExclusions] = value }
 

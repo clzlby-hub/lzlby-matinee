@@ -100,6 +100,7 @@ import com.tcltv.sahne.data.HomeLayout
 import com.tcltv.sahne.data.InputDetection
 import com.tcltv.sahne.data.TemperatureUnit
 import com.tcltv.sahne.data.WallpaperKey
+import com.tcltv.sahne.system.ProxyStarter
 import com.tcltv.sahne.ui.GlassStyle
 import com.tcltv.sahne.ui.ImagePicker
 import com.tcltv.sahne.ui.KeyCap
@@ -364,6 +365,20 @@ private fun SectionContent(
             viewModel,
             firstRow,
             listOf(SystemLink(R.string.system_network, R.string.system_network_sub, Settings.ACTION_WIFI_SETTINGS)),
+            extra = {
+                val s by viewModel.settings.collectAsStateWithLifecycle()
+                val context = LocalContext.current
+                val flClashInstalled = remember { ProxyStarter.isFlClashInstalled(context) }
+                if (flClashInstalled) {
+                    ToggleRow(
+                        R.string.setting_autostart_proxy,
+                        R.string.setting_autostart_proxy_sub,
+                        s.autoStartProxy,
+                    ) {
+                        viewModel.update { setAutoStartProxy(it) }
+                    }
+                }
+            },
         )
         Section.DISPLAY_SOUND -> SystemPanel(
             viewModel,

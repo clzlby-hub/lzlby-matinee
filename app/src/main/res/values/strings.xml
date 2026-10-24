@@ -99,6 +99,8 @@
     <string name="setting_city">Weather city</string>
     <string name="setting_app_order">Arrange apps</string>
     <string name="setting_app_order_sub">You can also hold OK on a card</string>
+    <string name="setting_autostart_proxy">Auto-start proxy (FlClash)</string>
+    <string name="setting_autostart_proxy_sub">Automatically wake up FlClash proxy on boot or wake</string>
     <string name="setting_widget_inputs">Show inputs</string>
     <string name="setting_widget_inputs_sub">Row of HDMI devices</string>
     <string name="setting_memory_warning">Memory warning</string>

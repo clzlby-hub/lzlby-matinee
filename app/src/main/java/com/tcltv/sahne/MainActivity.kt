@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         viewModel.onHomeResumed()
         resumeTick.intValue++
+        viewModel.checkAutoStartProxy()
     }
 
     override fun onPause() {

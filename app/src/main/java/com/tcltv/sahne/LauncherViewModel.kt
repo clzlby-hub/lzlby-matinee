@@ -48,6 +48,7 @@ import com.tcltv.sahne.data.ProfilePhoto
 import com.tcltv.sahne.system.Connection
 import com.tcltv.sahne.system.HomeKeyService
 import com.tcltv.sahne.system.NetworkStatus
+import com.tcltv.sahne.system.ProxyStarter
 import com.tcltv.sahne.system.SpeedTest
 import com.tcltv.sahne.system.PlayStoreUpdate
 import com.tcltv.sahne.system.ReceiverMonitor
@@ -365,6 +366,16 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch { runWeatherLoop() }
         viewModelScope.launch { watchForNewDevices() }
         viewModelScope.launch { runBingWallpaperLoop() }
+        checkAutoStartProxy()
+    }
+
+    fun checkAutoStartProxy() {
+        viewModelScope.launch {
+            val s = settings.first()
+            if (s.autoStartProxy) {
+                ProxyStarter.startIfInstalled(getApplication())
+            }
+        }
     }
 
     private suspend fun runBingWallpaperLoop() {
