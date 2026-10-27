@@ -150,7 +150,7 @@ internal fun GridHome(
     fun requestFocus(packageName: String?) {
         if (packageName != null) focusRequest = GridFocusRequest(packageName, focusRequest.nonce + 1)
     }
-    LaunchedEffect(resumeTick, apps.isNotEmpty()) { requestFocus(current?.packageName) }
+    LaunchedEffect(resumeTick, apps.isNotEmpty()) { requestFocus(current?.packageName ?: apps.firstOrNull()?.packageName) }
     // "Move" in the long-press menu lifts the card, exactly as holding OK on it used to.
     LaunchedEffect(menu.moveRequest) {
         menu.moveRequest?.let {
@@ -327,13 +327,13 @@ private fun GridTile(
             Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
-                .scaleBy(focusScale(active, if (lifted) 1.14f else 1.1f))
-                .shadow(if (active) 18.dp else 0.dp, shape)
+                .scaleBy(focusScale(active, if (lifted) 1.15f else 1.10f))
+                .shadow(if (active) 22.dp else 0.dp, shape)
                 .clip(shape)
                 .background(if (cardTheme == CardTheme.LIGHT) CardLight else CardDark)
                 // Scale alone is too subtle from across the room, so focus also lights a bright rim and a sheen.
                 .focusSheen(sheen, shape)
-                .then(if (active) Modifier else Modifier.border(1.dp, Color.White.copy(alpha = if (dimmed) 0.05f else 0.14f), shape))
+                .then(if (active) Modifier.border(3.dp, Color.White, shape) else Modifier.border(1.dp, Color.White.copy(alpha = if (dimmed) 0.05f else 0.14f), shape))
                 .focusRequester(focusRequester)
                 .onFocusChanged {
                     focused = it.isFocused
@@ -385,8 +385,9 @@ private fun AddTile(enabled: Boolean, isRowEnd: Boolean, onClick: () -> Unit) {
             Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
-                .scaleBy(focusScale(focused, 1.1f))
+                .scaleBy(focusScale(focused, 1.10f))
                 .glass(shape, if (focused) GlassStyle.Lit else GlassStyle.Pill)
+                .then(if (focused) Modifier.border(3.dp, Color.White, shape) else Modifier)
                 .blockRightExit(isRowEnd)
                 .onFocusChanged { focused = it.isFocused }
                 .clickable(enabled = enabled, interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),

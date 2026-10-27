@@ -1,6 +1,7 @@
 package com.tcltv.sahne
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,7 +29,12 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         viewModel.onHomeResumed()
         resumeTick.intValue++
-        viewModel.checkAutoStartProxy()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        viewModel.onHomeResumed()
+        resumeTick.intValue++
     }
 
     override fun onPause() {

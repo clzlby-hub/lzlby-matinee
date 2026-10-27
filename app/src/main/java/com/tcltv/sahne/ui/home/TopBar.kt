@@ -58,6 +58,9 @@ import com.tcltv.sahne.SpeedState
 import com.tcltv.sahne.R
 import com.tcltv.sahne.WeatherUiState
 import android.provider.Settings
+import androidx.compose.ui.platform.LocalContext
+import com.tcltv.sahne.data.BingWallpaperClient
+import com.tcltv.sahne.data.WallpaperKey
 import com.tcltv.sahne.system.Connection
 import com.tcltv.sahne.system.ReceiverState
 import com.tcltv.sahne.data.TemperatureUnit
@@ -149,8 +152,10 @@ private fun ClockWeatherPill(viewModel: LauncherViewModel, onOpenSettings: () ->
 
     Row(
         Modifier
+            .scaleBy(focusScale(focused, 1.06f))
             .height(32.dp)
             .glass(CircleShape, if (focused) GlassStyle.Lit else GlassStyle.Pill)
+            .then(if (focused) Modifier.border(2.dp, Color.White, CircleShape) else Modifier)
             .onFocusChanged { focused = it.isFocused }
             .semantics { contentDescription = openSettings }
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onOpenSettings)
@@ -239,8 +244,10 @@ private fun ProfileButton(viewModel: LauncherViewModel, open: Boolean, onClick: 
     val description = stringResource(R.string.a11y_profile_menu)
     Row(
         Modifier
+            .scaleBy(focusScale(highlighted, 1.06f))
             .height(32.dp)
             .then(if (highlighted || settings.showGreeting) Modifier.glass(CircleShape, if (highlighted) GlassStyle.Lit else GlassStyle.Pill) else Modifier)
+            .then(if (highlighted) Modifier.border(2.dp, Color.White, CircleShape) else Modifier)
             .onFocusChanged { focused = it.isFocused }
             .semantics { contentDescription = description }
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
@@ -277,11 +284,14 @@ private fun ProfileMenu(viewModel: LauncherViewModel, onOpenSettings: () -> Unit
     val memory by viewModel.memory.collectAsStateWithLifecycle()
     val cleaning by viewModel.cleaning.collectAsStateWithLifecycle()
     val lastClean by viewModel.lastClean.collectAsStateWithLifecycle()
+    val bingTitle by viewModel.currentBingTitle.collectAsStateWithLifecycle()
+    val isBing = settings.wallpaper == WallpaperKey.BING
     val firstFocus = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
     // Receiver rows only report status, so focus starts on the first row that does something.
     val rows = buildList {
+        if (isBing) add("bing_wallpaper")
         if (settings.showMemory) add("memory")
         add("settings")
     }
@@ -309,6 +319,34 @@ private fun ProfileMenu(viewModel: LauncherViewModel, onOpenSettings: () -> Unit
         }
         if (settings.showChromecast) {
             ReceiverRow(R.drawable.ic_cast, stringResource(R.string.chromecast), cast.state, castLabels())
+        }
+        if (isBing) {
+            MenuRow(
+                icon = R.drawable.ic_refresh,
+                title = stringResource(R.string.wallpaper_bing_refresh),
+                modifier = focusFor("bing_wallpaper"),
+                onClick = viewModel::nextBingWallpaper,
+                below = {
+                    val title = bingTitle ?: BingWallpaperClient.getTitle(LocalContext.current)
+                    if (!title.isNullOrBlank()) {
+                        BasicText(
+                            title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = interStyle(10.5.sp, 500, Palette.TextSecondary),
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                    }
+                },
+                trailing = {
+                    Box(Modifier.background(Color.White.copy(alpha = 0.12f), RoundedCornerShape(11.dp)).padding(horizontal = 8.dp, vertical = 3.dp)) {
+                        BasicText(
+                            stringResource(R.string.wallpaper_bing_switch),
+                            style = interStyle(10.5.sp, 600, Color.White),
+                        )
+                    }
+                },
+            )
         }
         if (settings.showMemory) {
             val result = lastClean
@@ -444,8 +482,10 @@ private fun BellButton(viewModel: LauncherViewModel, open: Boolean, onClick: () 
     Box {
         Box(
             Modifier
+                .scaleBy(focusScale(highlighted, 1.15f))
                 .size(32.dp)
                 .glass(CircleShape, if (highlighted) GlassStyle.Bright else GlassStyle.Pill)
+                .then(if (highlighted) Modifier.border(2.dp, Color.White, CircleShape) else Modifier)
                 .onFocusChanged { focused = it.isFocused }
                 .semantics { contentDescription = description }
                 .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),
@@ -501,13 +541,6 @@ private fun NotificationPanel(viewModel: LauncherViewModel, onClose: () -> Unit)
                 viewModel.openNotice(notice)
                 onClose()
             }
-        }
-        if (settings.showPlayUpdates && !hasAccess) {
-            BasicText(
-                stringResource(R.string.notifications_access_needed),
-                style = interStyle(10.5.sp, 400, Palette.TextMuted).copy(lineHeight = 15.sp),
-                modifier = Modifier.padding(start = 4.dp, top = 8.dp, end = 4.dp),
-            )
         }
     }
 }
@@ -622,8 +655,10 @@ private fun WifiButton(viewModel: LauncherViewModel) {
     Box {
         Box(
             Modifier
+                .scaleBy(focusScale(focused, 1.15f))
                 .size(32.dp)
                 .glass(CircleShape, if (focused) GlassStyle.Bright else GlassStyle.Pill)
+                .then(if (focused) Modifier.border(2.dp, Color.White, CircleShape) else Modifier)
                 .onFocusChanged {
                     focused = it.isFocused
                     viewModel.onNetworkFocusChanged(it.isFocused)
